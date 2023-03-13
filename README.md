@@ -1,9 +1,7 @@
 # saessak-log-back-java
 
---- 
 ## 프로젝트 소개
 
----
 ![image](https://user-images.githubusercontent.com/111469930/224657117-a98af8fb-a1f2-464b-bfeb-1aaee72f94ac.png)
 
 
@@ -12,12 +10,10 @@
 
 ## 프로젝트 기간
 
----
 2023.02 ~ 2023.03
 
 ##  팀 구성
 
----
 
 총원 8명
 
@@ -28,8 +24,6 @@
 프로젝트 github 링크 : https://github.com/saessak-study
 
 ## Back-End (Java) 기술스택
-
----
 
 주요 프레임워크 / 라이브러리
 - Java, Spring Boot, Spring Security, Spring Data JPA, Swagger
