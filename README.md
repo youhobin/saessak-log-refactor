@@ -35,7 +35,7 @@
 - Java, Spring Boot, Spring Security, Spring Data JPA, Swagger
 
 데이터 베이스
-- MySQL
+- AWS RDS(MySQL)
 
 Infra
 - AWS EC2
