@@ -25,6 +25,8 @@
 - Back-End (python) : 1명
 - Front-End : 4명
 
+프로젝트 github 링크 : https://github.com/saessak-study
+
 ## Back-End (Java) 기술스택
 
 ---
