@@ -39,5 +39,6 @@
 
 Infra
 - AWS EC2
+- AWS S3
 
 ---
