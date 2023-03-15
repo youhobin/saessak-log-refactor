@@ -113,7 +113,7 @@ public class UserService {
                             new IllegalStateException("등록되지 않은 회원입니다."));
              findUser.changeTempPassword(encoder.encode(changePasswordDto.getPassword()));
         } else {
-            new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new NotMatchPasswordException("비밀번호가 일치하지 않습니다.");
         }
     }
 

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -162,5 +161,30 @@ public class UserServiceTest {
         assertThatThrownBy(() -> userService.findPassword(userFindPasswordRequest))
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining("등록되지 않은 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경")
+    public void update_password() throws Exception {
+        //given
+        ChangePasswordDto dto = new ChangePasswordDto("123456", "123456");
+
+        //when
+        userService.updatePassword("hobin", dto);
+        User findUser = userRepository.findByProfileId("hobin");
+
+        //then
+        assertThat(encoder.matches("123456", findUser.getPassword())).isTrue();
+    }
+
+    @Test
+    public void update_password_not_match() throws Exception {
+        //given
+        ChangePasswordDto dto = new ChangePasswordDto("123456", "asdf");
+
+        //then
+        assertThatThrownBy(() -> userService.updatePassword("hobin", dto))
+            .isInstanceOf(NotMatchPasswordException.class)
+            .hasMessageContaining("비밀번호가 일치하지 않습니다.");
     }
 }

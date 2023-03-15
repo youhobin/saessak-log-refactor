@@ -50,7 +50,8 @@ public class UserController {
     @ApiOperation(value = "비밀번호 찾기")
     @PostMapping("/resetPassword")
     public ResponseEntity<ResetPasswordResponse> findPassword(
-            @RequestBody UserFindPasswordRequest userFindPasswordRequest) {
+        @RequestBody UserFindPasswordRequest userFindPasswordRequest) {
+
         ResetPasswordResponse resetPassword = userService.findPassword(userFindPasswordRequest);
         return ResponseEntity.status(HttpStatus.OK).body(resetPassword);
     }
@@ -59,6 +60,7 @@ public class UserController {
     @PatchMapping("/updatePassword")
     public ResponseEntity updatePassword(
             @RequestBody ChangePasswordDto changePasswordDto, Authentication authentication) {
+
         String profileId = authentication.getName();
         userService.updatePassword(profileId, changePasswordDto);
         return ResponseEntity.status(HttpStatus.OK).body("비밀번호 변경이 완료되었습니다.");
