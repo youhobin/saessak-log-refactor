@@ -118,22 +118,24 @@ public class UserService {
     }
 
     // 마이페이지 유저정보
-    public ResponseUserInformationDto userInformation(String profileId) {
-        User findUser = userRepository.findByProfileId(profileId);
+    public UserInformationResponse userInformation(String profileId) {
 
-        List<Reaction> reactions = reactionRepository.findByUserIdx(findUser.getId());
+        //토큰에서 얻어온 profileId로
+        User findUser = userRepository.findWithReactionsByProfileId(profileId);
+
         List<Subscription> subscriptions = subscriptionRepository.findByFromUserID(findUser.getId());
 
-        ResponseUserInformationDto userInformationDto = new ResponseUserInformationDto();
-
-        List<Long> reactionPostId = reactions.stream().map(reaction -> reaction.getPost().getId()).collect(Collectors.toList());
+        List<Long> reactionPostId = findUser.getReactions().stream().map(reaction -> reaction.getPost().getId()).collect(Collectors.toList());
         List<Long> subscriptionToUserId = subscriptions.stream().map(user -> user.getToUserId().getId()).collect(Collectors.toList());
-        userInformationDto.setSubscriptionToUserId(subscriptionToUserId);
-        userInformationDto.setReactionPostId(reactionPostId);
-        userInformationDto.setUserId(findUser.getId());
-        userInformationDto.setProfileId(findUser.getProfileId());
-        userInformationDto.setEmail(findUser.getEmail());
-        userInformationDto.setName(findUser.getName());
+
+        UserInformationResponse userInformationDto = UserInformationResponse.builder()
+            .userId(findUser.getId())
+            .profileId(findUser.getProfileId())
+            .email(findUser.getEmail())
+            .name(findUser.getName())
+            .reactionPostId(reactionPostId)
+            .subscriptionToUserId(subscriptionToUserId)
+            .build();
         return userInformationDto;
     }
 

@@ -2,8 +2,11 @@ package saessak.log.user;
 
 import lombok.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import saessak.log.reaction.Reaction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -27,6 +30,9 @@ public class User {
 
     @Column(nullable = false)
     private String email;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Reaction> reactions = new ArrayList<>();
 
     @Builder
     private User(String profileId, String password, String name, String email) {

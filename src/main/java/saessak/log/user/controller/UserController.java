@@ -68,9 +68,9 @@ public class UserController {
 
     @ApiOperation(value = "마이페이지")
     @GetMapping("/information")
-    public ResponseEntity<ResponseUserInformationDto> userInformation(Authentication authentication){
+    public ResponseEntity<UserInformationResponse> userInformation(Authentication authentication){
         String profileId = authentication.getName();
-        ResponseUserInformationDto userInformationDto = userService.userInformation(profileId);
+        UserInformationResponse userInformationDto = userService.userInformation(profileId);
         return ResponseEntity.ok().body(userInformationDto);
     }
 }

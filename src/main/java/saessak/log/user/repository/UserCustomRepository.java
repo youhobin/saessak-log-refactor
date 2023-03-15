@@ -14,4 +14,9 @@ public interface UserCustomRepository {
     @Query("select u from User u where u.profileId = :profileId")
     Optional<User> findOptionalByProfileId(@Param("profileId") String profileId);
 
+    @Query("select u from User u" +
+        " join fetch u.reactions r" +
+        " where u.profileId = :profileId")
+    User findWithReactionsByProfileId(@Param("profileId") String profileId);
+
 }
