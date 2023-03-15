@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface UserCustomRepository {
 
     @Query("select u from User u where u.profileId = :profileId and u.name = :name and u.email = :email")
-    Optional<User> findByUserInfo(@Param("email") String email,@Param("name") String name,@Param("profileId") String profileId);
+    Optional<User> findByUserInfo(@Param("email") String email, @Param("name") String name, @Param("profileId") String profileId);
 
     @Query("select u from User u where u.profileId = :profileId")
     Optional<User> findOptionalByProfileId(@Param("profileId") String profileId);

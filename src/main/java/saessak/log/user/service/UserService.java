@@ -77,33 +77,30 @@ public class UserService {
     }
 
     // 아이디 찾기
-    public ResponseFindIdDto findProfileId(UserFindIdDto userFindIdDto) {
+    public FindIdResponse findProfileId(UserFindIdRequest userFindIdRequest) {
         User findUser = userRepository
-                .findByEmailAndName(userFindIdDto.getEmail(), userFindIdDto.getName())
+                .findByEmailAndName(userFindIdRequest.getEmail(), userFindIdRequest.getName())
                 .orElseThrow(() ->
                         new IllegalStateException("등록되지 않은 회원입니다.")
                 );
-        ResponseFindIdDto responseFindIdDto = new ResponseFindIdDto();
-        responseFindIdDto.setProfileId(findUser.getProfileId());
 
-        return responseFindIdDto;
+        return new FindIdResponse(findUser.getProfileId());
     }
 
     // 비밀번호 찾기
     @Transactional
-    public ResponseResetPasswordDto findPassword(UserFindPasswordDto userFindPasswordDto) {
+    public ResetPasswordResponse findPassword(UserFindPasswordRequest userFindPasswordRequest) {
         User findUser = userRepository.findByUserInfo(
-                        userFindPasswordDto.getEmail(),
-                        userFindPasswordDto.getName(),
-                        userFindPasswordDto.getProfileId())
+                        userFindPasswordRequest.getEmail(),
+                        userFindPasswordRequest.getName(),
+                        userFindPasswordRequest.getProfileId())
                 .orElseThrow(() ->
                         new IllegalStateException("등록되지 않은 회원입니다."));
+
         String resetPassword = RandomStringUtils.randomAlphabetic(8);
         findUser.changeTempPassword(encoder.encode(resetPassword));
-        ResponseResetPasswordDto responseResetPasswordDto = new ResponseResetPasswordDto();
-        responseResetPasswordDto.setResetPassword(resetPassword);
 
-        return responseResetPasswordDto;
+        return new ResetPasswordResponse(resetPassword);
     }
 
     // 비밀번호 변경

@@ -27,7 +27,7 @@ public class UserController {
 
     @ApiOperation(value = "아이디 중복검사")
     @PostMapping("/duplicate")
-    public ResponseEntity duplicateProfileId(@RequestBody ProfileIdDuplicateDto profileIdDuplicateDto) {
+    public ResponseEntity duplicateProfileId(@Validated @RequestBody ProfileIdDuplicateDto profileIdDuplicateDto) {
             userService.duplicateUser(profileIdDuplicateDto);
             return ResponseEntity.ok().body("가입 가능한 아이디입니다.");
     }
@@ -35,23 +35,23 @@ public class UserController {
     //로그인시 token 생성
     @ApiOperation(value = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody UserLoginDto userLoginDto) {
+    public ResponseEntity<TokenResponse> login(@Validated @RequestBody UserLoginDto userLoginDto) {
         TokenResponse token = userService.login(userLoginDto);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @ApiOperation(value = "아이디 찾기")
     @PostMapping("/findId")
-    public ResponseEntity<ResponseFindIdDto> findProfileId(@RequestBody UserFindIdDto userFindIdDto) {
-        ResponseFindIdDto profileId = userService.findProfileId(userFindIdDto);
+    public ResponseEntity<FindIdResponse> findProfileId(@RequestBody UserFindIdRequest userFindIdRequest) {
+        FindIdResponse profileId = userService.findProfileId(userFindIdRequest);
         return ResponseEntity.status(HttpStatus.OK).body(profileId);
     }
 
     @ApiOperation(value = "비밀번호 찾기")
     @PostMapping("/resetPassword")
-    public ResponseEntity<ResponseResetPasswordDto> findPassword(
-            @RequestBody UserFindPasswordDto userFindPasswordDto) {
-        ResponseResetPasswordDto resetPassword = userService.findPassword(userFindPasswordDto);
+    public ResponseEntity<ResetPasswordResponse> findPassword(
+            @RequestBody UserFindPasswordRequest userFindPasswordRequest) {
+        ResetPasswordResponse resetPassword = userService.findPassword(userFindPasswordRequest);
         return ResponseEntity.status(HttpStatus.OK).body(resetPassword);
     }
 

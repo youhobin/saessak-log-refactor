@@ -1,11 +1,11 @@
 package saessak.log.user.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
-public class ResponseFindIdDto {
+@AllArgsConstructor
+public class FindIdResponse {
 
     private String profileId;
 }

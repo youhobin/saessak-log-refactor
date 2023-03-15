@@ -2,12 +2,14 @@ package saessak.log.user.dto;
 
 import lombok.*;
 
-@Setter
+import javax.validation.constraints.NotNull;
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProfileIdDuplicateDto {
 
+    @NotNull
     private String profileId;
 
 }

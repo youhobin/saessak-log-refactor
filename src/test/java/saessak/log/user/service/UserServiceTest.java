@@ -12,9 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.user.User;
-import saessak.log.user.dto.ProfileIdDuplicateDto;
-import saessak.log.user.dto.UserJoinDto;
-import saessak.log.user.dto.UserLoginDto;
+import saessak.log.user.dto.*;
 import saessak.log.user.error.DuplicateEmailException;
 import saessak.log.user.error.DuplicateLoginIdException;
 import saessak.log.user.error.NotMatchPasswordException;
@@ -40,7 +38,9 @@ public class UserServiceTest {
     @BeforeEach
     public void user() {
         UserJoinDto userJoinDto = new UserJoinDto("hobin", "1234", "1234", "name", "hobin@naver.com");
+        UserJoinDto userJoinDto2 = new UserJoinDto("ghdb", "12345", "12345", "name2", "ghdb@naver.com");
         userService.join(userJoinDto);
+        userService.join(userJoinDto2);
     }
 
     @Test
@@ -101,6 +101,7 @@ public class UserServiceTest {
     }
 
     @Test
+    @DisplayName("로그인 성공 시 토큰 발급")
     public void login() throws Exception {
         //given
         UserLoginDto loginDto = new UserLoginDto("hobin", "1234");
@@ -110,5 +111,56 @@ public class UserServiceTest {
 
         //then
         assertThat(token.getToken()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Id 찾기 성공")
+    public void find_profileId_O() throws Exception {
+        //given
+        UserFindIdRequest findIdRequest = new UserFindIdRequest("name", "hobin@naver.com");
+
+        //when
+        FindIdResponse findIdResponse = userService.findProfileId(findIdRequest);
+
+        //then
+        assertThat(findIdResponse.getProfileId()).isEqualTo("hobin");
+    }
+
+    @Test
+    @DisplayName("Id 찾기 실패")
+    public void find_profileId_X() throws Exception {
+        //given
+        UserFindIdRequest findIdRequest = new UserFindIdRequest("name2", "hobin@naver.com");
+
+        //then
+        assertThatThrownBy(() -> userService.findProfileId(findIdRequest))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("등록되지 않은 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 성공 - 임시 비밀번호로 변경")
+    public void find_password_O() throws Exception {
+        //given
+        UserFindPasswordRequest userFindPasswordRequest = new UserFindPasswordRequest("name", "hobin", "hobin@naver.com");
+
+        //when
+        ResetPasswordResponse resetPasswordResponse = userService.findPassword(userFindPasswordRequest);
+        String resetPassword = resetPasswordResponse.getResetPassword();
+
+        //then
+        assertThat(resetPassword).isNotEqualTo("1234");
+    }
+
+    @Test
+    @DisplayName("비밀번호 찾기 실패")
+    public void find_password_X() throws Exception {
+        //given
+        UserFindPasswordRequest userFindPasswordRequest = new UserFindPasswordRequest("name2", "hobin", "hobin@naver.com");
+
+        //then
+        assertThatThrownBy(() -> userService.findPassword(userFindPasswordRequest))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessageContaining("등록되지 않은 회원입니다.");
     }
 }
