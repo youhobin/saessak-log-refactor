@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import saessak.log.jwt.dto.TokenDto;
 import saessak.log.user.dto.*;
@@ -20,9 +21,8 @@ public class UserController {
 
     @ApiOperation(value = "회원가입")
     @PostMapping("/join")
-    public ResponseEntity createUser(@RequestBody UserJoinDto userJoinDto) {
-        userService.join(userJoinDto);
-        return ResponseEntity.ok().body("회원가입이 성공 하였습니다.");
+    public ResponseEntity<Long> createUser(@Validated @RequestBody UserJoinDto userJoinDto) {
+        return ResponseEntity.ok().body(userService.join(userJoinDto));
     }
 
     @ApiOperation(value = "아이디 중복검사")

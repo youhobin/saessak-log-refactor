@@ -13,6 +13,8 @@ import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
+import saessak.log.user.error.DuplicateEmailException;
+import saessak.log.user.error.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
 import java.util.List;
@@ -36,16 +38,12 @@ public class UserService {
     public Long join(UserJoinDto userJoinDto) {
         duplicateEmail(userJoinDto);
         if (userJoinDto.getPassword().equals(userJoinDto.getPasswordCheck())) {
-            User user = User.builder()
-                    .profileId(userJoinDto.getProfileId())
-                    .email(userJoinDto.getEmail())
-                    .name(userJoinDto.getName())
-                    .password(encoder.encode(userJoinDto.getPassword()))
-                    .build();
-            userRepository.save(user);
-            return user.getId();
+            User user = userJoinDto.toEntity();
+
+            User savedUser = userRepository.save(user.passwordEncode(encoder));
+            return savedUser.getId();
         }
-        throw new RuntimeException("입력하신 password 가 일치하지 않습니다.");
+        throw new NotMatchPasswordException("입력하신 password 가 일치하지 않습니다.");
 
     }
 
@@ -53,7 +51,7 @@ public class UserService {
     private void duplicateEmail(UserJoinDto userJoinDto) {
         userRepository.findByEmail(userJoinDto.getEmail())
                 .ifPresent(e ->{
-                    throw new RuntimeException("중복된 이메일입니다.");
+                    throw new DuplicateEmailException("중복된 이메일입니다.");
                 });
     }
 

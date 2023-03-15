@@ -1,6 +1,7 @@
 package saessak.log.user;
 
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.persistence.*;
 
@@ -15,12 +16,16 @@ public class User {
     @Column(name = "user_idx")
     private Long id;
 
+    @Column(nullable = false)
     private String profileId;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String email;
 
     @Builder
@@ -38,6 +43,11 @@ public class User {
             .name(name)
             .email(email)
             .build();
+    }
+
+    public User passwordEncode(BCryptPasswordEncoder encoder) {
+        this.password = encoder.encode(password);
+        return this;
     }
 
     public void changeTempPassword(String resetPassword) {
