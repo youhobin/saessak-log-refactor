@@ -7,11 +7,9 @@ import javax.validation.constraints.NotNull;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLoginDto {
+public class ProfileIdDuplicateDto {
 
     @NotNull
     private String profileId;
 
-    @NotNull
-    private String password;
 }

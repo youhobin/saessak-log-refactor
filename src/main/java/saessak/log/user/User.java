@@ -1,8 +1,12 @@
 package saessak.log.user;
 
 import lombok.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import saessak.log.reaction.Reaction;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -15,13 +19,20 @@ public class User {
     @Column(name = "user_idx")
     private Long id;
 
+    @Column(nullable = false)
     private String profileId;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String email;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Reaction> reactions = new ArrayList<>();
 
     @Builder
     private User(String profileId, String password, String name, String email) {
@@ -38,6 +49,11 @@ public class User {
             .name(name)
             .email(email)
             .build();
+    }
+
+    public User passwordEncode(BCryptPasswordEncoder encoder) {
+        this.password = encoder.encode(password);
+        return this;
     }
 
     public void changeTempPassword(String resetPassword) {

@@ -2,16 +2,12 @@ package saessak.log.user.dto;
 
 import lombok.*;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLoginDto {
-
-    @NotNull
+public class UserFindPasswordRequest {
+    private String name;
     private String profileId;
+    private String email;
 
-    @NotNull
-    private String password;
 }

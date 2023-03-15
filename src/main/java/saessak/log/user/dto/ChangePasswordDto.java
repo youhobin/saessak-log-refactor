@@ -1,10 +1,10 @@
 package saessak.log.user.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
-@Setter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChangePasswordDto {
     private String password;
     private String passwordCheck;

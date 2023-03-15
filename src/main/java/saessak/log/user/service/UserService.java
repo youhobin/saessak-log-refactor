@@ -6,19 +6,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import saessak.log.jwt.TokenProvider;
-import saessak.log.jwt.dto.TokenDto;
+import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.reaction.Reaction;
 import saessak.log.reaction.repository.ReactionRepository;
 import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
+import saessak.log.user.error.DuplicateEmailException;
+import saessak.log.user.error.DuplicateLoginIdException;
+import saessak.log.user.error.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,16 +37,12 @@ public class UserService {
     public Long join(UserJoinDto userJoinDto) {
         duplicateEmail(userJoinDto);
         if (userJoinDto.getPassword().equals(userJoinDto.getPasswordCheck())) {
-            User user = User.builder()
-                    .profileId(userJoinDto.getProfileId())
-                    .email(userJoinDto.getEmail())
-                    .name(userJoinDto.getName())
-                    .password(encoder.encode(userJoinDto.getPassword()))
-                    .build();
-            userRepository.save(user);
-            return user.getId();
+            User user = userJoinDto.toEntity();
+
+            User savedUser = userRepository.save(user.passwordEncode(encoder));
+            return savedUser.getId();
         }
-        throw new RuntimeException("입력하신 password 가 일치하지 않습니다.");
+        throw new NotMatchPasswordException("입력하신 password 가 일치하지 않습니다.");
 
     }
 
@@ -53,20 +50,20 @@ public class UserService {
     private void duplicateEmail(UserJoinDto userJoinDto) {
         userRepository.findByEmail(userJoinDto.getEmail())
                 .ifPresent(e ->{
-                    throw new RuntimeException("중복된 이메일입니다.");
+                    throw new DuplicateEmailException("중복된 이메일입니다.");
                 });
     }
 
     // profileId 중복검사
-    public void duplicateUser(UserDuplicateDto userDuplicateDto) {
-        userRepository.findOptionalByProfileId(userDuplicateDto.getProfileId())
+    public void duplicateUser(ProfileIdDuplicateDto profileIdDuplicateDto) {
+        userRepository.findOptionalByProfileId(profileIdDuplicateDto.getProfileId())
                 .ifPresent(u -> {
-                    throw new RuntimeException("중복된 아이디입니다.");
+                    throw new DuplicateLoginIdException("중복된 아이디입니다.");
                 });
     }
 
     // 로그인
-    public TokenDto login(UserLoginDto userLoginDto) {
+    public TokenResponse login(UserLoginDto userLoginDto) {
         User findUser = userRepository.findOptionalByProfileId(userLoginDto.getProfileId())
                 .orElseThrow(() -> {
                     throw new IllegalStateException("등록되지 않은 회원입니다.");
@@ -80,33 +77,30 @@ public class UserService {
     }
 
     // 아이디 찾기
-    public ResponseFindIdDto findProfileId(UserFindIdDto userFindIdDto) {
+    public FindIdResponse findProfileId(UserFindIdRequest userFindIdRequest) {
         User findUser = userRepository
-                .findByEmailAndName(userFindIdDto.getEmail(), userFindIdDto.getName())
+                .findByEmailAndName(userFindIdRequest.getEmail(), userFindIdRequest.getName())
                 .orElseThrow(() ->
                         new IllegalStateException("등록되지 않은 회원입니다.")
                 );
-        ResponseFindIdDto responseFindIdDto = new ResponseFindIdDto();
-        responseFindIdDto.setProfileId(findUser.getProfileId());
 
-        return responseFindIdDto;
+        return new FindIdResponse(findUser.getProfileId());
     }
 
     // 비밀번호 찾기
     @Transactional
-    public ResponseResetPasswordDto findPassword(UserFindPasswordDto userFindPasswordDto) {
+    public ResetPasswordResponse findPassword(UserFindPasswordRequest userFindPasswordRequest) {
         User findUser = userRepository.findByUserInfo(
-                        userFindPasswordDto.getEmail(),
-                        userFindPasswordDto.getName(),
-                        userFindPasswordDto.getProfileId())
+                        userFindPasswordRequest.getEmail(),
+                        userFindPasswordRequest.getName(),
+                        userFindPasswordRequest.getProfileId())
                 .orElseThrow(() ->
                         new IllegalStateException("등록되지 않은 회원입니다."));
+
         String resetPassword = RandomStringUtils.randomAlphabetic(8);
         findUser.changeTempPassword(encoder.encode(resetPassword));
-        ResponseResetPasswordDto responseResetPasswordDto = new ResponseResetPasswordDto();
-        responseResetPasswordDto.setResetPassword(resetPassword);
 
-        return responseResetPasswordDto;
+        return new ResetPasswordResponse(resetPassword);
     }
 
     // 비밀번호 변경
@@ -119,27 +113,29 @@ public class UserService {
                             new IllegalStateException("등록되지 않은 회원입니다."));
              findUser.changeTempPassword(encoder.encode(changePasswordDto.getPassword()));
         } else {
-            new RuntimeException("비밀번호가 일치하지 않습니다.");
+            throw new NotMatchPasswordException("비밀번호가 일치하지 않습니다.");
         }
     }
 
     // 마이페이지 유저정보
-    public ResponseUserInformationDto userInformation(String profileId) {
-        User findUser = userRepository.findByProfileId(profileId);
+    public UserInformationResponse userInformation(String profileId) {
 
-        List<Reaction> reactions = reactionRepository.findByUserIdx(findUser.getId());
+        //토큰에서 얻어온 profileId로
+        User findUser = userRepository.findWithReactionsByProfileId(profileId);
+
         List<Subscription> subscriptions = subscriptionRepository.findByFromUserID(findUser.getId());
 
-        ResponseUserInformationDto userInformationDto = new ResponseUserInformationDto();
-
-        List<Long> reactionPostId = reactions.stream().map(reaction -> reaction.getPost().getId()).collect(Collectors.toList());
+        List<Long> reactionPostId = findUser.getReactions().stream().map(reaction -> reaction.getPost().getId()).collect(Collectors.toList());
         List<Long> subscriptionToUserId = subscriptions.stream().map(user -> user.getToUserId().getId()).collect(Collectors.toList());
-        userInformationDto.setSubscriptionToUserId(subscriptionToUserId);
-        userInformationDto.setReactionPostId(reactionPostId);
-        userInformationDto.setUserId(findUser.getId());
-        userInformationDto.setProfileId(findUser.getProfileId());
-        userInformationDto.setEmail(findUser.getEmail());
-        userInformationDto.setName(findUser.getName());
+
+        UserInformationResponse userInformationDto = UserInformationResponse.builder()
+            .userId(findUser.getId())
+            .profileId(findUser.getProfileId())
+            .email(findUser.getEmail())
+            .name(findUser.getName())
+            .reactionPostId(reactionPostId)
+            .subscriptionToUserId(subscriptionToUserId)
+            .build();
         return userInformationDto;
     }
 
