@@ -1,23 +1,11 @@
 package saessak.log.jwt;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import saessak.log.jwt.dto.TokenDto;
-import saessak.log.user.User;
-import saessak.log.user.service.UserService;
+import saessak.log.jwt.dto.TokenResponse;
 
-import java.security.Key;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -27,7 +15,7 @@ public class TokenProvider {
     private final long tokenValidityInMilliseconds = 7 * 24 * 60 * 1_000;
     private final String key = "asdfadgasgdsxzcnzdfhtehh34hrh324y363462344g4g434h34236343424esdfgfdgndfjdfjfgjdfgfbdcvdfgadgaergead";
 
-    public TokenDto createToken(Long userId, String profileId) {
+    public TokenResponse createToken(Long userId, String profileId) {
 
         long now = (new Date()).getTime();
 
@@ -40,7 +28,7 @@ public class TokenProvider {
                 .compact();
 
         //jwtToken 생성해줌.
-        return new TokenDto(token);
+        return new TokenResponse(token);
     }
 
     //토큰을 다시 payload 로 반환.

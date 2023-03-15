@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import saessak.log.jwt.dto.TokenDto;
+import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.user.dto.*;
 import saessak.log.user.service.UserService;
 
@@ -32,10 +32,11 @@ public class UserController {
             return ResponseEntity.ok().body("가입 가능한 아이디입니다.");
     }
 
+    //로그인시 token 생성
     @ApiOperation(value = "로그인")
     @PostMapping("/login")
-    public ResponseEntity<TokenDto> login(@RequestBody UserLoginDto userLoginDto) {
-        TokenDto token = userService.login(userLoginDto);
+    public ResponseEntity<TokenResponse> login(@RequestBody UserLoginDto userLoginDto) {
+        TokenResponse token = userService.login(userLoginDto);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 

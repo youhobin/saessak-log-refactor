@@ -6,7 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import saessak.log.jwt.TokenProvider;
-import saessak.log.jwt.dto.TokenDto;
+import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.reaction.Reaction;
 import saessak.log.reaction.repository.ReactionRepository;
 import saessak.log.subscription.Subscription;
@@ -63,7 +63,7 @@ public class UserService {
     }
 
     // 로그인
-    public TokenDto login(UserLoginDto userLoginDto) {
+    public TokenResponse login(UserLoginDto userLoginDto) {
         User findUser = userRepository.findOptionalByProfileId(userLoginDto.getProfileId())
                 .orElseThrow(() -> {
                     throw new IllegalStateException("등록되지 않은 회원입니다.");
