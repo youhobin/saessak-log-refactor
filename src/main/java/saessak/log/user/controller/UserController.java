@@ -27,14 +27,9 @@ public class UserController {
 
     @ApiOperation(value = "아이디 중복검사")
     @PostMapping("/duplicate")
-    public ResponseEntity duplicateProfileId(@RequestBody UserDuplicateDto userDuplicateDto) {
-        try {
-            userService.duplicateUser(userDuplicateDto);
+    public ResponseEntity duplicateProfileId(@RequestBody ProfileIdDuplicateDto profileIdDuplicateDto) {
+            userService.duplicateUser(profileIdDuplicateDto);
             return ResponseEntity.ok().body("가입 가능한 아이디입니다.");
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("이미 가입하신 회원입니다.");
-        }
-
     }
 
     @ApiOperation(value = "로그인")

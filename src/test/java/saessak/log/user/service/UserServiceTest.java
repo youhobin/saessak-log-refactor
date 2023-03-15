@@ -9,8 +9,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import saessak.log.user.User;
+import saessak.log.user.dto.ProfileIdDuplicateDto;
 import saessak.log.user.dto.UserJoinDto;
 import saessak.log.user.error.DuplicateEmailException;
+import saessak.log.user.error.DuplicateLoginIdException;
 import saessak.log.user.error.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
@@ -56,6 +58,15 @@ public class UserServiceTest {
             .isInstanceOf(NotMatchPasswordException.class);
     }
 
+    @Test
+    public void duplicate_profileId() throws Exception {
+        //given
+        ProfileIdDuplicateDto profileIdDuplicateDto = new ProfileIdDuplicateDto("hobin");
+
+        //then
+        assertThatThrownBy(() -> userService.duplicateUser(profileIdDuplicateDto))
+            .isInstanceOf(DuplicateLoginIdException.class);
+    }
 
 
 }

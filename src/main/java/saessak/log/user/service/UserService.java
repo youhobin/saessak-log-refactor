@@ -14,13 +14,12 @@ import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
 import saessak.log.user.error.DuplicateEmailException;
+import saessak.log.user.error.DuplicateLoginIdException;
 import saessak.log.user.error.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional(readOnly = true)
@@ -56,10 +55,10 @@ public class UserService {
     }
 
     // profileId 중복검사
-    public void duplicateUser(UserDuplicateDto userDuplicateDto) {
-        userRepository.findOptionalByProfileId(userDuplicateDto.getProfileId())
+    public void duplicateUser(ProfileIdDuplicateDto profileIdDuplicateDto) {
+        userRepository.findOptionalByProfileId(profileIdDuplicateDto.getProfileId())
                 .ifPresent(u -> {
-                    throw new RuntimeException("중복된 아이디입니다.");
+                    throw new DuplicateLoginIdException("중복된 아이디입니다.");
                 });
     }
 
