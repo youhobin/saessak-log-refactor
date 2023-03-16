@@ -73,10 +73,14 @@ public class PostController {
     public ResponseEntity<PostResponseDto> post(
             @PathVariable("postId") Long postId,
             Authentication authentication
-    ) throws JsonProcessingException {
-        String userProfileId = null;
-        if (isLogin(authentication)) userProfileId = authentication.getName();
-        PostResponseDto postResponseDto = postService.findPost(postId, userProfileId);
+    ) {
+        PostResponseDto postResponseDto;
+        if (isLogin(authentication)) {
+            String userProfileId = authentication.getName();
+            postResponseDto = postService.findPost(postId, userProfileId);
+        } else {
+            postResponseDto = postService.findPost(postId);
+        }
         return ResponseEntity.ok().body(postResponseDto);
     }
 

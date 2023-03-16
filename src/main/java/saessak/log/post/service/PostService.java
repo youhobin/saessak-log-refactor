@@ -78,11 +78,12 @@ public class PostService {
 
     public PostResponseDto findPost(Long postId, String userProfileId) {
         User user = userRepository.findByProfileId(userProfileId);
-        PostResponseDto postResponseDto;
-        if (user == null)
-            postResponseDto = postRepository.findPostDetailById(postId);
-        else
-            postResponseDto = postRepository.findPostDetailById(postId, user.getId());
+        PostResponseDto postResponseDto = postRepository.findPostDetailById(postId, user.getId());
+        return postResponseDto;
+    }
+
+    public PostResponseDto findPost(Long postId) {
+        PostResponseDto postResponseDto = postRepository.findPostDetailById(postId);
         return postResponseDto;
     }
 
