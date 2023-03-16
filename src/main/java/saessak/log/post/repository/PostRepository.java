@@ -20,17 +20,21 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
 
 
-    @Query("select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r) as likeCount) " +
+    @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r) as likeCount) " +
             "from Post p " +
             "left join p.postMedia pm " +
             "left join p.comments c " +
             "left join p.reactions r " +
             "left join p.user u " +
             "group by p.id " +
-            "order by likeCount desc, p.createdDate desc")
+            "order by likeCount desc, p.createdDate desc",
+        countQuery = "select count(p) from Post p")
     Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable);
 
-    @Query("select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r) as likeCount, count(r2) > 0) " +
+
+
+
+    @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r) as likeCount, count(r2) > 0) " +
             "from Post p " +
             "left join p.postMedia pm " +
             "left join p.comments c " +
@@ -40,21 +44,23 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "on r2.user.id = :userId " +
             "and r2.post.id = p.id " +
             "group by p.id " +
-            "order by likeCount desc, p.createdDate desc")
+            "order by likeCount desc, p.createdDate desc",
+        countQuery = "select count(p) from Post p")
     Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable, @Param("userId") Long userId);
 
 
-    @Query("select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c) as commentCount, count(distinct r)) " +
+    @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c) as commentCount, count(distinct r)) " +
             "from Post p " +
             "left join p.postMedia pm " +
             "left join p.comments c " +
             "left join p.reactions r " +
             "left join p.user u " +
             "group by p.id " +
-            "order by commentCount desc, p.createdDate desc")
+            "order by commentCount desc, p.createdDate desc",
+        countQuery = "select count(p) from Post p")
     Page<PostMainDto> findAllPostMainDtoOrderByCommentCount(Pageable pageable);
 
-    @Query("select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c) as commentCount, count(distinct r), count(r2) > 0) " +
+    @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, count(distinct c) as commentCount, count(distinct r), count(r2) > 0) " +
             "from Post p " +
             "left join p.postMedia pm " +
             "left join p.comments c " +
@@ -64,7 +70,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "on r2.user.id = :userId " +
             "and r2.post.id = p.id " +
             "group by p.id " +
-            "order by commentCount desc, p.createdDate desc")
+            "order by commentCount desc, p.createdDate desc",
+        countQuery = "select count(p) from Post p")
     Page<PostMainDto> findAllPostMainDtoOrderByCommentCount(Pageable pageable, @Param("userId") Long userId);
 
     @Query("select new saessak.log.post.dto.PostResponseDto(u.profileId, pm.imageFile, pm.postText, count(r))" +

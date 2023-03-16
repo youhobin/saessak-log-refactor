@@ -89,11 +89,14 @@ public class PostService {
     public PostAllResponseDto findAllPostsByLikeCount(String profileId, int limit, int page) {
         User user = userRepository.findByProfileId(profileId);
         PageRequest pageRequest = PageRequest.of(page, limit);
-        Page<PostMainDto> pagePostMainDto;
-        if (user == null)
-            pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest);
-        else
-            pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest, user.getId());
+        Page<PostMainDto> pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest, user.getId());
+        List<PostMainDto> postMainDtoList = pagePostMainDto.getContent();
+        return new PostAllResponseDto(postMainDtoList);
+    }
+
+    public PostAllResponseDto findAllPostsByLikeCount(int limit, int page) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        Page<PostMainDto> pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest);
         List<PostMainDto> postMainDtoList = pagePostMainDto.getContent();
         return new PostAllResponseDto(postMainDtoList);
     }
@@ -101,11 +104,14 @@ public class PostService {
     public PostAllResponseDto findAllPostsByCommentsCount(String profileId, int limit, int page) {
         User user = userRepository.findByProfileId(profileId);
         PageRequest pageRequest = PageRequest.of(page, limit);
-        Page<PostMainDto> pagePostMainDtoList;
-        if (user == null)
-            pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest);
-        else
-            pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest, user.getId());
+        Page<PostMainDto> pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest, user.getId());
+        List<PostMainDto> postMainDtoList = pagePostMainDtoList.getContent();
+        return new PostAllResponseDto(postMainDtoList);
+    }
+
+    public PostAllResponseDto findAllPostsByCommentsCount(int limit, int page) {
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        Page<PostMainDto> pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest);
         List<PostMainDto> postMainDtoList = pagePostMainDtoList.getContent();
         return new PostAllResponseDto(postMainDtoList);
     }

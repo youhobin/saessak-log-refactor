@@ -13,10 +13,6 @@ import saessak.log.post.dto.PostResponseDto;
 import saessak.log.post.dto.PostSaveResponseDto;
 import saessak.log.post.dto.SubscribePostResponse;
 import saessak.log.post.service.PostService;
-import saessak.log.post_media.dto.PostMediaSaveDto;
-
-import java.io.IOException;
-import java.util.Base64;
 
 @RequiredArgsConstructor
 @RequestMapping("/posts")
@@ -46,9 +42,13 @@ public class PostController {
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             Authentication authentication) {
-        String userProfileId = null;
-        if (authentication != null) userProfileId = authentication.getName();
-        PostAllResponseDto postResponseDto = postService.findAllPostsByLikeCount(userProfileId, limit, page);
+        PostAllResponseDto postResponseDto;
+        if (isLogin(authentication)) {
+            String userProfileId = authentication.getName();
+            postResponseDto = postService.findAllPostsByLikeCount(userProfileId, limit, page);
+        } else {
+            postResponseDto = postService.findAllPostsByLikeCount(limit, page);
+        }
         return ResponseEntity.ok().body(postResponseDto);
     }
 
@@ -58,9 +58,13 @@ public class PostController {
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
             @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
             Authentication authentication) {
-        String userProfileId = null;
-        if (authentication != null) userProfileId = authentication.getName();
-        PostAllResponseDto postResponseDto = postService.findAllPostsByCommentsCount(userProfileId, limit, page);
+        PostAllResponseDto postResponseDto;
+        if (isLogin(authentication)) {
+            String userProfileId = authentication.getName();
+            postResponseDto = postService.findAllPostsByCommentsCount(userProfileId, limit, page);
+        } else {
+            postResponseDto = postService.findAllPostsByCommentsCount(limit, page);
+        }
         return ResponseEntity.ok().body(postResponseDto);
     }
 
@@ -71,7 +75,7 @@ public class PostController {
             Authentication authentication
     ) throws JsonProcessingException {
         String userProfileId = null;
-        if (authentication != null) userProfileId = authentication.getName();
+        if (isLogin(authentication)) userProfileId = authentication.getName();
         PostResponseDto postResponseDto = postService.findPost(postId, userProfileId);
         return ResponseEntity.ok().body(postResponseDto);
     }
@@ -99,5 +103,10 @@ public class PostController {
         String profileId = authentication.getName();
         SubscribePostResponse subscribePosts = postService.getSubscribedPosts(profileId, page, limit);
         return ResponseEntity.ok().body(subscribePosts);
+    }
+
+
+    private static boolean isLogin(Authentication authentication) {
+        return authentication != null;
     }
 }
