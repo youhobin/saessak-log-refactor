@@ -12,9 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
-import saessak.log.user.error.DuplicateEmailException;
-import saessak.log.user.error.DuplicateLoginIdException;
-import saessak.log.user.error.NotMatchPasswordException;
+import saessak.log.user.exception.DuplicateEmailException;
+import saessak.log.user.exception.DuplicateLoginIdException;
+import saessak.log.user.exception.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;

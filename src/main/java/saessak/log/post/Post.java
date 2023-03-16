@@ -27,7 +27,6 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "user_idx")
     private User user;
 
-
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY)
     private PostMedia postMedia;
 
