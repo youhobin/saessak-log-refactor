@@ -1,4 +1,4 @@
-package saessak.log.user.error;
+package saessak.log.user.exception;
 
 public class DuplicateEmailException extends RuntimeException {
 

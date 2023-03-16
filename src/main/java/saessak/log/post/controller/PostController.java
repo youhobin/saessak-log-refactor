@@ -28,15 +28,13 @@ public class PostController {
 
     @ApiOperation(value = "게시글 저장")
     @PostMapping("/new")
-    public ResponseEntity<PostSaveResponseDto> savePost(@RequestParam String postText,
-                                                        @RequestParam MultipartFile file, Authentication authentication) {
+    public ResponseEntity<PostSaveResponseDto> savePost(
+            @RequestParam String postText,
+            @RequestParam MultipartFile file,
+            Authentication authentication) {
+
         String profileId = authentication.getName();
-        Long savedPostId = null;
-        try {
-            savedPostId = postService.savePost(profileId, postText, file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Long savedPostId = postService.savePost(profileId, postText, file);
         PostSaveResponseDto PostSaveResponseDto = new PostSaveResponseDto(savedPostId);
 
         return ResponseEntity.ok().body(PostSaveResponseDto);

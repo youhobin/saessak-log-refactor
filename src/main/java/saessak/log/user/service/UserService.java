@@ -7,15 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import saessak.log.jwt.TokenProvider;
 import saessak.log.jwt.dto.TokenResponse;
-import saessak.log.reaction.Reaction;
 import saessak.log.reaction.repository.ReactionRepository;
 import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
-import saessak.log.user.error.DuplicateEmailException;
-import saessak.log.user.error.DuplicateLoginIdException;
-import saessak.log.user.error.NotMatchPasswordException;
+import saessak.log.user.exception.DuplicateEmailException;
+import saessak.log.user.exception.DuplicateLoginIdException;
+import saessak.log.user.exception.NotMatchPasswordException;
 import saessak.log.user.repository.UserRepository;
 
 import java.util.List;
@@ -128,7 +127,7 @@ public class UserService {
         List<Long> reactionPostId = findUser.getReactions().stream().map(reaction -> reaction.getPost().getId()).collect(Collectors.toList());
         List<Long> subscriptionToUserId = subscriptions.stream().map(user -> user.getToUserId().getId()).collect(Collectors.toList());
 
-        UserInformationResponse userInformationDto = UserInformationResponse.builder()
+        UserInformationResponse userInformationResponse = UserInformationResponse.builder()
             .userId(findUser.getId())
             .profileId(findUser.getProfileId())
             .email(findUser.getEmail())
@@ -136,7 +135,7 @@ public class UserService {
             .reactionPostId(reactionPostId)
             .subscriptionToUserId(subscriptionToUserId)
             .build();
-        return userInformationDto;
+        return userInformationResponse;
     }
 
 }
