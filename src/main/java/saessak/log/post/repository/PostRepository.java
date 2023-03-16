@@ -82,7 +82,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " where p.id = :postId")
     PostResponseDto findPostDetailById(@Param("postId") Long postId);
 
-    @Query("select new saessak.log.post.dto.PostResponseDto(u.profileId, pm.imageFile, pm.postText, count(r), count(s) > 0, count(r2) > 0)" +
+    @Query(value = "select new saessak.log.post.dto.PostResponseDto(u.profileId, pm.imageFile, pm.postText, count(r), count(s) > 0, count(r2) > 0)" +
             " from Post p" +
             " left join p.postMedia pm" +
             " left join p.reactions r" +
@@ -93,10 +93,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " left join Reaction r2" +
             " on r2.post.id = p.id" +
             " and r2.user.id = :userId" +
-            " where p.id = :postId")
+            " where p.id = :postId",
+        countQuery = "select count(p) from Post p")
     PostResponseDto findPostDetailById(@Param("postId") Long postId, @Param("userId") Long userId);
 
-    @Query("select new saessak.log.post.dto.PostMyActivityDto(p.id, pm.imageFile, count(distinct c), count(distinct r))" +
+    @Query(value = "select new saessak.log.post.dto.PostMyActivityDto(p.id, pm.imageFile, count(distinct c), count(distinct r))" +
             " from Post p" +
             " left join p.user u" +
             " left join p.postMedia pm" +
@@ -104,10 +105,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " left join p.reactions r" +
             " where u.id = :userId" +
             " group by p.id" +
-            " order by p.createdDate desc")
+            " order by p.createdDate desc",
+        countQuery = "select count(p) from Post p")
     Page<PostMyActivityDto> findMyPost(@Param("userId") Long userId, Pageable pageable);
 
-    @Query("select new saessak.log.post.dto.SubscribePostDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r), count(r2) > 0)" +
+    @Query(value = "select new saessak.log.post.dto.SubscribePostDto(p.id, u.profileId, pm.imageFile, count(distinct c), count(distinct r), count(r2) > 0)" +
             " from Post p, Subscription s" +
             " left join p.user u" +
             " left join p.postMedia pm" +
@@ -121,7 +123,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             " where tu.id = u.id" +
             " and fu.id = :userId" +
             " group by p.id" +
-            " order by p.createdDate desc")
-    List<SubscribePostDto> findSubscribedPosts(@Param("userId") Long userId, Pageable pageable);
+            " order by p.createdDate desc",
+        countQuery = "select count(p) from Post p")
+    Page<SubscribePostDto> findSubscribedPosts(@Param("userId") Long userId, Pageable pageable);
 
 }

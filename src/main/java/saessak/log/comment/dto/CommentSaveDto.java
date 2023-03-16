@@ -16,7 +16,6 @@ import javax.persistence.EntityListeners;
 @EntityListeners(AuditingEntityListener.class)
 public class CommentSaveDto {
 
-    private Long post; // 포스트 idx
     private String comment; //코멘트 내용
 
 }

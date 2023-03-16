@@ -1,29 +1,17 @@
-package saessak.log.user.userConfig;
+package saessak.log.config;
 
-import antlr.BaseAST;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import saessak.log.jwt.CustomAuthenticationEntryPoint;
 import saessak.log.jwt.JwtFilter;
-import saessak.log.jwt.TokenProvider;
 import saessak.log.user.service.UserService;
-
-import java.security.Key;
 
 @EnableWebSecurity
 @Configuration
@@ -46,6 +34,7 @@ public class SecurityConfig {
                     .authorizeRequests()
                         .antMatchers("/user").permitAll() // user 권한 허용 // 이거 다시
                         .antMatchers("/user/join", "/user/login", "/user/duplicate", "/user/findId", "/user/resetPassword").permitAll() // join, login 허용
+                        .antMatchers(HttpMethod.GET, "/posts/{postId}/comments").permitAll()
                         .antMatchers(HttpMethod.GET,"/posts/likeCount").permitAll()
                         .antMatchers(HttpMethod.GET,"/posts/commentsCount").permitAll()
                         .antMatchers(HttpMethod.GET,"/posts/**").permitAll()

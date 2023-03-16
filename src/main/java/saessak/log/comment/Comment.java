@@ -1,9 +1,6 @@
 package saessak.log.comment;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import saessak.log.BaseTimeEntity;
 import saessak.log.post.Post;
 import saessak.log.user.User;
@@ -12,10 +9,8 @@ import saessak.log.user.User;
 import javax.persistence.*;
 
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "comment")
 public class Comment extends BaseTimeEntity {
 
     @Id
@@ -32,6 +27,21 @@ public class Comment extends BaseTimeEntity {
     private Post post;
 
     private String comment;
+
+    @Builder
+    private Comment(User user, Post post, String comment) {
+        this.user = user;
+        this.post = post;
+        this.comment = comment;
+    }
+
+    public static Comment of(User user, Post post, String comment) {
+        return Comment.builder()
+            .user(user)
+            .post(post)
+            .comment(comment)
+            .build();
+    }
 
     //연관관계 메서드
     public void belongToPost(Post post) {

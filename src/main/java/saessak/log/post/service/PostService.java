@@ -139,7 +139,8 @@ public class PostService {
         Long userId = findUser.getId();
 
         PageRequest pageRequest = PageRequest.of(page, limit);
-        List<SubscribePostDto> subscribedPostList = postRepository.findSubscribedPosts(userId, pageRequest);
+        Page<SubscribePostDto> subscribedPosts = postRepository.findSubscribedPosts(userId, pageRequest);
+        List<SubscribePostDto> subscribedPostList = subscribedPosts.getContent();
         return new SubscribePostResponse(subscribedPostList);
     }
 
