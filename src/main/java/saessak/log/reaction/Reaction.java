@@ -9,7 +9,6 @@ import saessak.log.user.User;
 import javax.persistence.*;
 
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Reaction {

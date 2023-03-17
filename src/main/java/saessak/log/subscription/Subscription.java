@@ -1,10 +1,6 @@
 package saessak.log.subscription;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import saessak.log.user.User;
 
 
@@ -29,5 +25,18 @@ public class Subscription {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_user_id")
     private User fromUserId;
+
+    @Builder
+    public Subscription(User toUserId, User fromUserId) {
+        this.toUserId = toUserId;
+        this.fromUserId = fromUserId;
+    }
+
+    public static Subscription of(User toUserId, User fromUserId) {
+        return Subscription.builder()
+            .toUserId(toUserId)
+            .fromUserId(fromUserId)
+            .build();
+    }
 
 }

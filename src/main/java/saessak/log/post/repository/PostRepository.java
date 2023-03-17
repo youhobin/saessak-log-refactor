@@ -127,4 +127,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
         countQuery = "select count(p) from Post p")
     Page<SubscribePostDto> findSubscribedPosts(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("select p from Post p" +
+        " join fetch p.user u" +
+        " where p.id = :postId")
+    Post findWithUserById(@Param("postId") Long postId);
+
 }

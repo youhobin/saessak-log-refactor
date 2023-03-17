@@ -118,8 +118,8 @@ public class PostService {
     }
 
     // 편의 기능 함수 추가 --아연
-    public Long findUserIndexByPostId(Long postIndex) {
-        Post foundedPost = postRepository.findById(postIndex).orElseThrow(() -> new IllegalArgumentException());
+    public Long findUserIndexByPostId(Long postId) {
+        Post foundedPost = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException());
         return foundedPost.getUser().getId();
     }
 

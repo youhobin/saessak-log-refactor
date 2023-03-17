@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import saessak.log.post.Post;
 import saessak.log.post.repository.PostRepository;
 import saessak.log.subscription.Subscription;
-import saessak.log.subscription.dto.SubscriptionDto;
+import saessak.log.subscription.dto.SubscriptionResponse;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.repository.UserRepository;
@@ -24,22 +24,22 @@ public class SubscriptionService {
     final SubscriptionRepository subscriptionRepository;
 
     @Transactional
-    public Boolean subscribe(String fromUserProfileId, Long toUserId) {
+    public SubscriptionResponse subscribeUser(String fromUserProfileId, Long postId) {
+        Post post = postRepository.findWithUserById(postId);
+        User toUser = post.getUser();
         User fromUser = userRepository.findByProfileId(fromUserProfileId);
-        User toUser = userRepository.findById(toUserId).orElseThrow(() -> new IllegalArgumentException());
-        Subscription previousSubscription = subscriptionRepository.findByFromUserIdAndToUserId(fromUser.getId(), toUserId);
-        if (previousSubscription == null) {
-            Subscription subscription = new Subscription();
-            subscription.setToUserId(toUser);
-            log.info("toUser setting done");
-            subscription.setFromUserId(fromUser);
-            log.info("setting done");
-            subscriptionRepository.save(subscription);
-            return true;
-        } else {
-            subscriptionRepository.deleteById(previousSubscription.getId());
-            return false;
-        }
+
+        Subscription subscription = Subscription.of(toUser, fromUser);
+        Subscription savedSubscription = subscriptionRepository.save(subscription);
+        return new SubscriptionResponse(savedSubscription.getId(), true);
     }
 
+    @Transactional
+    public void unSubscribeUser(String fromUserProfileId, Long postId) {
+        Post post = postRepository.findWithUserById(postId);
+        Long toUserId = post.getUser().getId();
+
+        Subscription findSubscription = subscriptionRepository.findByFromUserProfileIdAndToUserId(fromUserProfileId, toUserId);
+        subscriptionRepository.deleteById(findSubscription.getId());
+    }
 }
