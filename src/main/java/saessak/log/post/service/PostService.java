@@ -64,14 +64,14 @@ public class PostService {
 
         User user = userRepository.findByProfileId(profileId);
         Post post = Post.from(user);
-        Post savedPost = postRepository.save(post);
 
         String imageFileName = response.getBody();
         log.info("imageFileName={}", imageFileName);
 
         PostMedia postMedia = PostMedia.of(imageFileName, postText);
         postMedia.belongToPost(post);
-        postMediaRepository.save(postMedia);
+        Post savedPost = postRepository.save(post);
+//        postMediaRepository.save(postMedia);
 
         return savedPost.getId();
     }

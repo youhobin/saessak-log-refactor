@@ -44,6 +44,5 @@ public class CommentController {
 
         AllCommentsByPostResponse commentResponse = commentService.fetchComments(postId, limit, page);
         return ResponseEntity.ok().body(commentResponse);
-
     }
 }
