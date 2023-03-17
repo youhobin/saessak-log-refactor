@@ -12,12 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ReactionRepository extends JpaRepository<Reaction, Long> {
 
-    @Query("select r from Reaction r where r.user.id = :userIdx and r.post.id = :postIdx")
-    Reaction findByUserIdxAndPostIdx(@Param("userIdx") Long userIdx, @Param("postIdx") Long postIdx);
-
     @Query("select r from Reaction r" +
-        " join fetch r.post p" +
-        " join fetch p.postMedia pm" +
-        " where r.user.id = :userIdx")
-    List<Reaction> findByUserIdx(@Param("userIdx") Long userIdx);
+        " join fetch r.user u" +
+        " where u.profileId = :profileId and r.post.id = :postId")
+    Optional<Reaction> findReaction(@Param("postId") Long postId, @Param("profileId") String profileId);
 }

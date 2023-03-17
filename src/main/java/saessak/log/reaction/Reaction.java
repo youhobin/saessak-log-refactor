@@ -1,9 +1,6 @@
 package saessak.log.reaction;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import saessak.log.post.Post;
 
 import saessak.log.user.User;
@@ -13,7 +10,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Reaction {
 
@@ -29,4 +26,17 @@ public class Reaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_idx")
     private Post post;
+
+    @Builder
+    private Reaction(User user, Post post) {
+        this.user = user;
+        this.post = post;
+    }
+
+    public static Reaction of(User user, Post post) {
+        return Reaction.builder()
+            .user(user)
+            .post(post)
+            .build();
+    }
 }

@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import saessak.log.post.Post;
 import saessak.log.post.repository.PostRepository;
 import saessak.log.reaction.Reaction;
-import saessak.log.reaction.dto.ReactionDto;
 import saessak.log.reaction.repository.ReactionRepository;
 import saessak.log.user.User;
 import saessak.log.user.repository.UserRepository;
@@ -21,19 +20,18 @@ public class ReactionService {
     final ReactionRepository reactionRepository;
 
     @Transactional
-    public boolean reaction(Long postId, String userProfileId) {
-        User user = userRepository.findByProfileId(userProfileId);
-        Reaction previousReaction = reactionRepository.findByUserIdxAndPostIdx(user.getId(), postId);
-        if (previousReaction == null) {
-            Reaction reaction = new Reaction();
-            Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException());
-            reaction.setUser(user);
-            reaction.setPost(post);
-            reactionRepository.save(reaction);
-            return true;
-        } else {
-            reactionRepository.deleteById(previousReaction.getId());
-            return false;
-        }
+    public Long likePost(Long postId, String profileId) {
+        User user = userRepository.findByProfileId(profileId);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalStateException("게시글을 찾을 수 없습니다."));
+
+        Reaction reaction = Reaction.of(user, post);
+        Reaction savedReaction = reactionRepository.save(reaction);
+        return savedReaction.getId();
+    }
+
+    @Transactional
+    public void unlikePost(Long postId, String profileId) {
+        Reaction reaction = reactionRepository.findReaction(postId, profileId).orElseThrow(() -> new IllegalStateException());
+        reactionRepository.deleteById(reaction.getId());
     }
 }
