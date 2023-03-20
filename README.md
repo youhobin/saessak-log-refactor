@@ -16,6 +16,13 @@
 
 ---
 
+## [ Entity Relation Diagram (ERD) ] 설계
+
+![image](https://user-images.githubusercontent.com/111469930/226231567-9af9efd0-337c-4a28-97ad-df39565ea130.png)
+
+
+---
+
 ##  팀 구성
 
 
