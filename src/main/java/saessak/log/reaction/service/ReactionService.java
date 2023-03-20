@@ -23,6 +23,7 @@ public class ReactionService {
     public Long likePost(Long postId, String profileId) {
         User user = userRepository.findByProfileId(profileId);
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalStateException("게시글을 찾을 수 없습니다."));
+        post.plusReactionCount();
 
         Reaction reaction = Reaction.of(user, post);
         Reaction savedReaction = reactionRepository.save(reaction);
@@ -32,6 +33,9 @@ public class ReactionService {
     @Transactional
     public void unlikePost(Long postId, String profileId) {
         Reaction reaction = reactionRepository.findReaction(postId, profileId).orElseThrow(() -> new IllegalStateException());
+        Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalStateException("게시글을 찾을 수 없습니다."));
+        post.minusReactionCount();
+
         reactionRepository.deleteById(reaction.getId());
     }
 }

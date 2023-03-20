@@ -27,6 +27,10 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "user_idx")
     private User user;
 
+    private long reactionCount;
+
+    private long commentsCount;
+
     @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private PostMedia postMedia;
 
@@ -38,6 +42,8 @@ public class Post extends BaseTimeEntity {
 
     private Post(User user) {
         this.user = user;
+        this.reactionCount = 0;
+        this.commentsCount = 0;
     }
 
     public static Post from(User user) {
@@ -49,7 +55,22 @@ public class Post extends BaseTimeEntity {
         this.postMedia = postMedia;
     }
 
+    public void plusCommentsCount() {
+        this.commentsCount = comments.size();
+    }
+
     public void createComments(Comment comment) {
         this.comments.add(comment);
+    }
+
+    public void plusReactionCount() {
+        this.reactionCount++;
+    }
+
+    public void minusReactionCount() {
+        if (reactionCount <= 0) {
+            throw new IllegalStateException("좋아요를 취소할 수 없습니다.");
+        }
+        this.reactionCount--;
     }
 }
