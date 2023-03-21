@@ -37,9 +37,6 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<Reaction> reactions = new ArrayList<>();
-
     private Post(User user) {
         this.user = user;
         this.reactionCount = 0;

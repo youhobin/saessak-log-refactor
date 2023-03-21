@@ -28,7 +28,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder encoder;
     private final TokenProvider tokenProvider;
-    private final ReactionRepository reactionRepository;
     private final SubscriptionRepository subscriptionRepository;
 
     // 회원가입
