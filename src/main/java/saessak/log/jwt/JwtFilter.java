@@ -12,7 +12,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
+import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.user.service.UserService;
 
 import javax.servlet.*;
@@ -26,46 +28,38 @@ import static io.jsonwebtoken.Header.JWT_TYPE;
 
 @Slf4j
 @RequiredArgsConstructor
-public class JwtFilter extends OncePerRequestFilter {
-    
-    private final UserService userService;
-    private final String key = "asdfadgasgdsxzcnzdfhtehh34hrh324y363462344g4g434h34236343424esdfgfdgndfjdfjfgjdfgfbdcvdfgadgaergead";;
-    
+public class JwtFilter extends GenericFilterBean {
+
+    private final TokenProvider tokenProvider;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-            log.info("authorization : {}", authorization);
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        HttpServletRequest servletRequest = (HttpServletRequest) request;
 
-            if (authorization == null || !authorization.startsWith("Bearer ")) {
-                log.info("authorization을 잘못 보냈습니다.");
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String token = authorization.split(" ")[1];
-
-            if (TokenProvider.isExpired(token, key)) {
-                log.info("토큰 만료");
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String profileId = TokenProvider.getProfileId(token, key);
-            log.info("profileId = {}", profileId);
-
-            UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(profileId, null, List.of(new SimpleGrantedAuthority("USER")));
-
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } catch (ExpiredJwtException e) {
-            log.error("만료된 토큰");
+        String jwt = resolveToken(servletRequest);
+        String requestURI = servletRequest.getRequestURI();
+        log.info("jwt={}", jwt);
+        if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+            Authentication authentication = tokenProvider.getAuthentication(jwt);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        else {
+            log.debug("유효한 JWT 토큰이 없습니다. uri: {}", requestURI);
         }
 
+        chain.doFilter(request, response);
 
-        filterChain.doFilter(request, response);
-        
     }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+
+        return null;
+    }
+
 
 }

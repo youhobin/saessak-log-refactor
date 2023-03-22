@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.user.dto.*;
 import saessak.log.user.service.UserService;
@@ -69,8 +71,12 @@ public class UserController {
     @ApiOperation(value = "마이페이지")
     @GetMapping("/information")
     public ResponseEntity<UserInformationResponse> userInformation(Authentication authentication){
-        String profileId = authentication.getName();
+        String profileId = getPrincipal().getProfileId();
         UserInformationResponse userInformationResponse = userService.userInformation(profileId);
         return ResponseEntity.ok().body(userInformationResponse);
+    }
+
+    private PrincipalDetail getPrincipal() {
+        return (PrincipalDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

@@ -2,9 +2,13 @@ package saessak.log.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.jwt.TokenProvider;
 import saessak.log.jwt.dto.TokenResponse;
 import saessak.log.reaction.repository.ReactionRepository;
@@ -29,6 +33,7 @@ public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final TokenProvider tokenProvider;
     private final SubscriptionRepository subscriptionRepository;
+    private final AuthenticationManagerBuilder managerBuilder;
 
     // 회원가입
     @Transactional
@@ -71,7 +76,14 @@ public class UserService {
             throw new IllegalStateException("비밀번호가 잘못되었습니다.");
         }
 
-        return tokenProvider.createToken(findUser.getId(), findUser.getProfileId());
+        PrincipalDetail principalDetail = new PrincipalDetail(findUser);
+
+        UsernamePasswordAuthenticationToken token
+            = new UsernamePasswordAuthenticationToken(principalDetail, userLoginDto.getPassword());
+
+        Authentication authenticate = managerBuilder.getObject().authenticate(token);
+
+        return tokenProvider.createToken(findUser.getId(), findUser.getProfileId(), authenticate);
     }
 
     // 아이디 찾기

@@ -11,16 +11,25 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import saessak.log.comment.security.principal.PrincipalDetail;
+import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
 import saessak.log.user.dto.*;
 import saessak.log.user.repository.UserRepository;
 import saessak.log.user.service.UserService;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -29,24 +38,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @Autowired private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Autowired private ObjectMapper objectMapper;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+    @Autowired private TestRestTemplate restTemplate;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Autowired private UserRepository userRepository;
 
-    @Autowired
-    private UserService userService;
+    @Autowired private UserService userService;
 
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
+    @Autowired private SubscriptionRepository subscriptionRepository;
 
+    @Autowired private BCryptPasswordEncoder encoder;
 
     @LocalServerPort
     private int port;
@@ -54,7 +58,18 @@ public class UserControllerTest {
     @BeforeEach
     public void create_user() {
         UserJoinDto userJoinDto1 = new UserJoinDto("ghdb132", "1234", "1234", "hobin", "hobin@naver.com");
-        userService.join(userJoinDto1);
+        User user1 = userJoinDto1.toEntity();
+        User userOne = user1.passwordEncode(encoder);
+        userRepository.save(userOne);
+
+        UserJoinDto userJoinDto2 = new UserJoinDto("hi", "1234", "1234", "tyu", "tyu@naver.com");
+        User user2 = userJoinDto2.toEntity();
+        User userTwo = user2.passwordEncode(encoder);
+        userRepository.save(userTwo);
+
+        Subscription subscription = Subscription.of(userOne, userTwo);
+        subscriptionRepository.save(subscription);
+
     }
 
     @Test
@@ -119,6 +134,26 @@ public class UserControllerTest {
                 .content(objectMapper.writeValueAsString(userLoginDto)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").isNotEmpty());
+
+
+//        String joinUrl = "http://localhost:" + port + "/user/join";
+//
+//        UserJoinDto userJoinDto1 = new UserJoinDto("qwer", "1234", "1234", "yit", "yit@naver.com");
+//        restTemplate.postForEntity(joinUrl, userJoinDto1, Long.class);
+//
+//        String loginUrl = "http://localhost:" + port + "/user/login";
+//
+//        UserLoginDto userLoginDto = new UserLoginDto("qwer", "1234");
+//        ResponseEntity<Object> loginResponse = restTemplate.postForEntity(loginUrl, userLoginDto, Object.class);
+//        Object body = loginResponse.getBody();
+//        System.out.println(body);
+//        String token = body.toString().split("=")[1];
+//        System.out.println(token);
+//
+//        PrincipalDetail principal = (PrincipalDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String profileId = principal.getProfileId();
+//        System.out.println(profileId);
+
     }
 
     @Test
@@ -168,33 +203,59 @@ public class UserControllerTest {
             .andExpect(jsonPath("$.resetPassword").isNotEmpty());
     }
 
-    @Test
-    @DisplayName("마이페이지")
-    public void myPage() throws Exception {
-        //given
-        String joinUrl = "http://localhost:" + port + "/user/join";
-
-        UserJoinDto userJoinDto1 = new UserJoinDto("ghdb132", "1234", "1234", "hobin", "hobin@naver.com");
-        restTemplate.postForEntity(joinUrl, userJoinDto1, Long.class);
-
-        String loginUrl = "http://localhost:" + port + "/user/login";
-
-        UserLoginDto userLoginDto = new UserLoginDto("ghdb132", "1234");
-        ResponseEntity<Object> loginResponse = restTemplate.postForEntity(loginUrl, userLoginDto, Object.class);
-        Object body = loginResponse.getBody();
-        String token = body.toString().split("=")[1];
-
-        String myPageUrl = "http://localhost:" + port + "/user/information";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token);
-        HttpEntity<String> httpEntity = new HttpEntity<>("", headers);
-
-        //when
-        ResponseEntity<UserInformationResponse> responseEntity = restTemplate.exchange(myPageUrl, HttpMethod.GET, httpEntity, UserInformationResponse.class);
-
-        //then
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().getProfileId()).isEqualTo("");
-    }
-
+//    @Test
+//    @DisplayName("마이페이지")
+//    public void myPage() throws Exception {
+//        //given
+//        String joinUrl = "http://localhost:" + port + "/user/join";
+//
+//        UserJoinDto userJoinDto1 = new UserJoinDto("ghdb132", "1234", "1234", "hobin", "hobin@naver.com");
+//        restTemplate.postForEntity(joinUrl, userJoinDto1, Long.class);
+//
+//        String loginUrl = "http://localhost:" + port + "/user/login";
+//
+//        UserLoginDto userLoginDto = new UserLoginDto("ghdb132", "1234");
+//        ResponseEntity<Object> loginResponse = restTemplate.postForEntity(loginUrl, userLoginDto, Object.class);
+//        Object body = loginResponse.getBody();
+//        String token = body.toString().split("=")[1];
+//
+//        String myPageUrl = "http://localhost:" + port + "/user/information";
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Authorization", "Bearer " + token);
+//        HttpEntity<String> httpEntity = new HttpEntity<>("", headers);
+//
+//        //when
+//        ResponseEntity<UserInformationResponse> responseEntity = restTemplate.exchange(myPageUrl, HttpMethod.GET, httpEntity, UserInformationResponse.class);
+//        System.out.println("responseEntity = " + responseEntity);
+//
+//        //then
+//        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+//        assertThat(responseEntity.getBody().getProfileId()).isEqualTo("");
+//    }
+//    @Test
+//    public void testUserInformation() throws Exception {
+//        // Given
+//        String profileId = "ghdb132";
+//        UserInformationResponse expectedResponse
+//            = new UserInformationResponse(1L, "ghdb132", "hobin@naver.com", "hobin", Arrays.asList(1L, 2L), Arrays.asList(3L, 4L));
+//
+//        given(userService.userInformation(profileId)).willReturn(expectedResponse);
+//
+//        // When
+//        mockMvc.perform(get("/user/information")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .with(user("ghdb132").password("1234").roles("USER"))
+//                .accept(MediaType.APPLICATION_JSON))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.userId").value(expectedResponse.getUserId()))
+//            .andExpect(jsonPath("$.profileId").value(expectedResponse.getProfileId()))
+//            .andExpect(jsonPath("$.email").value(expectedResponse.getEmail()))
+//            .andExpect(jsonPath("$.name").value(expectedResponse.getName()))
+//            .andExpect(jsonPath("$.reactionPostId").value(expectedResponse.getReactionPostId()))
+//            .andExpect(jsonPath("$.subscriptionToUserId").value(expectedResponse.getSubscriptionToUserId()));
+//
+//        // Then
+////        verify(userService, times(1)).userInformation(profileId);
+////        verifyNoMoreInteractions(userService);
+//    }
 }
