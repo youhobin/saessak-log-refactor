@@ -33,7 +33,6 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final PostMediaRepository postMediaRepository;
 
     @Transactional
     public Long savePost(String profileId, String postText, MultipartFile file) {
@@ -62,16 +61,15 @@ public class PostService {
 
         ResponseEntity<String> response = restTemplate.postForEntity(pythonApiUrl, request, String.class);
 
-        User user = userRepository.findByProfileId(profileId);
-        Post post = Post.from(user);
 
         String imageFileName = response.getBody();
         log.info("imageFileName={}", imageFileName);
 
+        User user = userRepository.findByProfileId(profileId);
         PostMedia postMedia = PostMedia.of(imageFileName, postText);
-        postMedia.belongToPost(post);
+        Post post = Post.of(user, postMedia);
+
         Post savedPost = postRepository.save(post);
-//        postMediaRepository.save(postMedia);
 
         return savedPost.getId();
     }

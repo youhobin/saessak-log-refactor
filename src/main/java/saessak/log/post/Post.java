@@ -27,24 +27,25 @@ public class Post extends BaseTimeEntity {
     @JoinColumn(name = "user_idx")
     private User user;
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "media_idx")
+    private PostMedia postMedia;
+
     private long reactionCount;
 
     private long commentsCount;
 
-    @OneToOne(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private PostMedia postMedia;
-
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
-    private Post(User user) {
+    private Post(User user, PostMedia postMedia) {
+        this.postMedia = postMedia;
         this.user = user;
         this.reactionCount = 0;
         this.commentsCount = 0;
     }
-
-    public static Post from(User user) {
-        return new Post(user);
+    public static Post of(User user, PostMedia postMedia) {
+        return new Post(user, postMedia);
     }
 
     //연관관계 편의 메서드/

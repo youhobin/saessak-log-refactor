@@ -30,8 +30,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable);
 
 
-
-
     @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, p.commentsCount, p.reactionCount, count(r) > 0) " +
             "from Post p " +
             "left join p.postMedia pm " +
@@ -43,7 +41,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "order by p.reactionCount desc, p.createdDate desc",
         countQuery = "select count(p) from Post p")
     Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable, @Param("userId") Long userId);
-
 
     @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, p.commentsCount, p.reactionCount) " +
             "from Post p " +

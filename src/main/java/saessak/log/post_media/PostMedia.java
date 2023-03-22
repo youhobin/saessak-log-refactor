@@ -19,18 +19,13 @@ public class PostMedia {
     @Column(name = "media_idx")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_idx")
-    private Post post;
-
     private String imageFile;
 
     private String postText;
 
 
     @Builder
-    private PostMedia(Post post, String imageFile, String postText) {
-        this.post = post;
+    private PostMedia(String imageFile, String postText) {
         this.imageFile = imageFile;
         this.postText = postText;
     }
@@ -40,12 +35,6 @@ public class PostMedia {
             .imageFile(imageFile)
             .postText(postText)
             .build();
-    }
-
-    //연관관계 편의 메서드/
-    public void belongToPost(Post post) {
-        this.post = post;
-        post.createPostMedia(this);
     }
 
 }
