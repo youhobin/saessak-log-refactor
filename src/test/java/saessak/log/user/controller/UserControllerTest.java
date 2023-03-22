@@ -38,22 +38,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 public class UserControllerTest {
 
-    @Autowired private MockMvc mockMvc;
+    @Autowired MockMvc mockMvc;
 
-    @Autowired private ObjectMapper objectMapper;
+    @Autowired ObjectMapper objectMapper;
 
-    @Autowired private TestRestTemplate restTemplate;
+    @Autowired TestRestTemplate restTemplate;
 
-    @Autowired private UserRepository userRepository;
+    @Autowired UserRepository userRepository;
 
-    @Autowired private UserService userService;
+    @Autowired UserService userService;
 
-    @Autowired private SubscriptionRepository subscriptionRepository;
+    @Autowired SubscriptionRepository subscriptionRepository;
 
-    @Autowired private BCryptPasswordEncoder encoder;
+    @Autowired BCryptPasswordEncoder encoder;
 
-    @LocalServerPort
-    private int port;
+    @LocalServerPort int port;
 
     @BeforeEach
     public void create_user() {
@@ -134,25 +133,6 @@ public class UserControllerTest {
                 .content(objectMapper.writeValueAsString(userLoginDto)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").isNotEmpty());
-
-
-//        String joinUrl = "http://localhost:" + port + "/user/join";
-//
-//        UserJoinDto userJoinDto1 = new UserJoinDto("qwer", "1234", "1234", "yit", "yit@naver.com");
-//        restTemplate.postForEntity(joinUrl, userJoinDto1, Long.class);
-//
-//        String loginUrl = "http://localhost:" + port + "/user/login";
-//
-//        UserLoginDto userLoginDto = new UserLoginDto("qwer", "1234");
-//        ResponseEntity<Object> loginResponse = restTemplate.postForEntity(loginUrl, userLoginDto, Object.class);
-//        Object body = loginResponse.getBody();
-//        System.out.println(body);
-//        String token = body.toString().split("=")[1];
-//        System.out.println(token);
-//
-//        PrincipalDetail principal = (PrincipalDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String profileId = principal.getProfileId();
-//        System.out.println(profileId);
 
     }
 

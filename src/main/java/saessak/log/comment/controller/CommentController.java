@@ -5,11 +5,13 @@ import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import saessak.log.comment.dto.AllCommentsByPostResponse;
 import saessak.log.comment.dto.CommentSaveDto;
 import saessak.log.comment.dto.CommentSaveResponseDto;
 import saessak.log.comment.dto.CommentResponse;
+import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.comment.service.CommentService;
 import saessak.log.user.service.UserService;
 
@@ -27,10 +29,9 @@ public class CommentController {
     @ApiResponse(code = 200, message = "댓글을 작성하셨습니다.", response = CommentSaveResponseDto.class)
     @PostMapping("/{postId}/comments/new")
     public ResponseEntity<CommentSaveResponseDto> saveComment(@RequestBody CommentSaveDto commentSaveDto,
-                                                              @PathVariable("postId") Long postId,
-                                                              Authentication authentication) {
-        String userProfileId = authentication.getName();
-        Long savedCommentId = commentService.saveComment(commentSaveDto, postId, userProfileId);
+                                                              @PathVariable("postId") Long postId) {
+        String profileId = getPrincipal().getProfileId();
+        Long savedCommentId = commentService.saveComment(commentSaveDto, postId, profileId);
         CommentSaveResponseDto commentSaveResponseDto = new CommentSaveResponseDto(savedCommentId);
         return ResponseEntity.ok().body(commentSaveResponseDto);
     }
@@ -44,5 +45,9 @@ public class CommentController {
 
         AllCommentsByPostResponse commentResponse = commentService.fetchComments(postId, limit, page);
         return ResponseEntity.ok().body(commentResponse);
+    }
+
+    private PrincipalDetail getPrincipal() {
+        return (PrincipalDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

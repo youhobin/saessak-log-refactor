@@ -48,11 +48,6 @@ public class Post extends BaseTimeEntity {
         return new Post(user, postMedia);
     }
 
-    //연관관계 편의 메서드/
-    public void createPostMedia(PostMedia postMedia) {
-        this.postMedia = postMedia;
-    }
-
     public void plusCommentsCount() {
         this.commentsCount = comments.size();
     }

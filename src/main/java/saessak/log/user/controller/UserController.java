@@ -61,16 +61,16 @@ public class UserController {
     @ApiOperation(value = "비밀번호 변경")
     @PatchMapping("/updatePassword")
     public ResponseEntity updatePassword(
-            @RequestBody ChangePasswordDto changePasswordDto, Authentication authentication) {
+            @RequestBody ChangePasswordDto changePasswordDto) {
 
-        String profileId = authentication.getName();
+        String profileId = getPrincipal().getProfileId();
         userService.updatePassword(profileId, changePasswordDto);
         return ResponseEntity.status(HttpStatus.OK).body("비밀번호 변경이 완료되었습니다.");
     }
 
     @ApiOperation(value = "마이페이지")
     @GetMapping("/information")
-    public ResponseEntity<UserInformationResponse> userInformation(Authentication authentication){
+    public ResponseEntity<UserInformationResponse> userInformation(){
         String profileId = getPrincipal().getProfileId();
         UserInformationResponse userInformationResponse = userService.userInformation(profileId);
         return ResponseEntity.ok().body(userInformationResponse);

@@ -5,8 +5,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.post.dto.MyActivitiesResponse;
 import saessak.log.post.dto.PostAllResponseDto;
 import saessak.log.post.dto.PostResponseDto;
@@ -26,10 +29,9 @@ public class PostController {
     @PostMapping("/new")
     public ResponseEntity<PostSaveResponseDto> savePost(
             @RequestParam String postText,
-            @RequestParam MultipartFile file,
-            Authentication authentication) {
+            @RequestParam MultipartFile file) {
 
-        String profileId = authentication.getName();
+        String profileId = getPrincipal().getProfileId();
         Long savedPostId = postService.savePost(profileId, postText, file);
         PostSaveResponseDto PostSaveResponseDto = new PostSaveResponseDto(savedPostId);
 
@@ -40,12 +42,11 @@ public class PostController {
     @GetMapping("/likeCount")
     public ResponseEntity<PostAllResponseDto> mainPostsOrderByLikeCount(
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            Authentication authentication) {
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         PostAllResponseDto postResponseDto;
-        if (isLogin(authentication)) {
-            String userProfileId = authentication.getName();
-            postResponseDto = postService.findAllPostsByLikeCount(userProfileId, limit, page);
+        String profileId = getPrincipal().getProfileId();
+        if (isLogin(profileId)) {
+            postResponseDto = postService.findAllPostsByLikeCount(profileId, limit, page);
         } else {
             postResponseDto = postService.findAllPostsByLikeCount(limit, page);
         }
@@ -56,12 +57,11 @@ public class PostController {
     @GetMapping("/commentsCount")
     public ResponseEntity<PostAllResponseDto> mainPostsOrderByCommentsCount(
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            Authentication authentication) {
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
         PostAllResponseDto postResponseDto;
-        if (isLogin(authentication)) {
-            String userProfileId = authentication.getName();
-            postResponseDto = postService.findAllPostsByCommentsCount(userProfileId, limit, page);
+        String profileId = getPrincipal().getProfileId();
+        if (isLogin(profileId)) {
+            postResponseDto = postService.findAllPostsByCommentsCount(profileId, limit, page);
         } else {
             postResponseDto = postService.findAllPostsByCommentsCount(limit, page);
         }
@@ -71,13 +71,11 @@ public class PostController {
     @ApiOperation(value = "게시글 단건 조회")
     @GetMapping("/{postId}")
     public ResponseEntity<PostResponseDto> post(
-            @PathVariable("postId") Long postId,
-            Authentication authentication
-    ) {
+            @PathVariable("postId") Long postId) {
         PostResponseDto postResponseDto;
-        if (isLogin(authentication)) {
-            String userProfileId = authentication.getName();
-            postResponseDto = postService.findPost(postId, userProfileId);
+        String profileId = getPrincipal().getProfileId();
+        if (isLogin(profileId)) {
+            postResponseDto = postService.findPost(postId, profileId);
         } else {
             postResponseDto = postService.findPost(postId);
         }
@@ -89,10 +87,9 @@ public class PostController {
     @GetMapping("/myActivity")
     public ResponseEntity<MyActivitiesResponse> userActivity(
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            Authentication authentication) {
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
 
-        String profileId = authentication.getName();
+        String profileId = getPrincipal().getProfileId();
         MyActivitiesResponse myActivityPosts = postService.getMyActivity(profileId, page, limit);
         return ResponseEntity.ok().body(myActivityPosts);
     }
@@ -101,16 +98,19 @@ public class PostController {
     @GetMapping("/subscribe")
     public ResponseEntity<SubscribePostResponse> subscribePost(
             @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
-            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
-            Authentication authentication) {
+            @RequestParam(value = "page", required = false, defaultValue = "0") Integer page) {
 
-        String profileId = authentication.getName();
+        String profileId = getPrincipal().getProfileId();
         SubscribePostResponse subscribePosts = postService.getSubscribedPosts(profileId, page, limit);
         return ResponseEntity.ok().body(subscribePosts);
     }
 
 
-    private static boolean isLogin(Authentication authentication) {
-        return authentication != null;
+    private static boolean isLogin(String profileId) {
+        return StringUtils.hasText(profileId);
+    }
+
+    private PrincipalDetail getPrincipal() {
+        return (PrincipalDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }
