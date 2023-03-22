@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import saessak.log.common.BaseResponse;
-import saessak.log.post.service.PostService;
 import saessak.log.subscription.dto.SubscriptionResponse;
 import saessak.log.subscription.service.SubscriptionService;
 

@@ -5,6 +5,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import saessak.log.reaction.Reaction;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,10 @@ public class User {
     @Column(nullable = false)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private Role role;
+
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Reaction> reactions = new ArrayList<>();
 
@@ -40,6 +45,7 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+        this.role = Role.USER;
     }
 
     public static User of(String profileId, String password, String name, String email) {
