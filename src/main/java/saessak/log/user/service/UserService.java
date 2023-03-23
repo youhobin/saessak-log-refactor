@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.jwt.TokenProvider;
 import saessak.log.jwt.dto.TokenResponse;
-import saessak.log.reaction.repository.ReactionRepository;
 import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;

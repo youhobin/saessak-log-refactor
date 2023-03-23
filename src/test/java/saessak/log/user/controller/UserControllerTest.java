@@ -11,11 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import saessak.log.comment.security.principal.PrincipalDetail;
 import saessak.log.subscription.Subscription;
 import saessak.log.subscription.repository.SubscriptionRepository;
 import saessak.log.user.User;
@@ -23,11 +21,8 @@ import saessak.log.user.dto.*;
 import saessak.log.user.repository.UserRepository;
 import saessak.log.user.service.UserService;
 
-import java.util.Arrays;
-
 import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

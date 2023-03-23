@@ -1,22 +1,21 @@
 package saessak.log.user.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import saessak.log.reaction.QReaction;
-import saessak.log.user.QUser;
 import saessak.log.user.User;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 
 import static saessak.log.reaction.QReaction.reaction;
 import static saessak.log.user.QUser.user;
 
 
-public class UserCustomRepositoryImpl implements UserCustomRepository{
+public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public UserCustomRepositoryImpl(JPAQueryFactory queryFactory) {
-        this.queryFactory = queryFactory;
+    public UserRepositoryCustomImpl(EntityManager em) {
+        this.queryFactory = new JPAQueryFactory(em);
     }
 
 

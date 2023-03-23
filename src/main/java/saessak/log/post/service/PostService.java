@@ -17,7 +17,6 @@ import saessak.log.post.dto.*;
 import saessak.log.post.exception.ImageSaveException;
 import saessak.log.post.repository.PostRepository;
 import saessak.log.post_media.PostMedia;
-import saessak.log.post_media.repository.PostMediaRepository;
 import saessak.log.user.User;
 import saessak.log.user.repository.UserRepository;
 
@@ -116,7 +115,7 @@ public class PostService {
     }
 
 
-    public MyActivitiesResponse getMyActivity(String profileId, Integer page, Integer limit) {
+    public MyActivitiesResponse getMyActivity(String profileId, int page, int limit) {
         User findUser = userRepository.findByProfileId(profileId);
         Long userId = findUser.getId();
 
