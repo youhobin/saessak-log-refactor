@@ -73,9 +73,8 @@ public class PostService {
         return savedPost.getId();
     }
 
-    public PostResponseDto findPost(Long postId, String userProfileId) {
-        User user = userRepository.findByProfileId(userProfileId);
-        PostResponseDto postResponseDto = postRepository.findPostDetailById(postId, user.getId());
+    public PostResponseDto findPost(Long postId, String profileId) {
+        PostResponseDto postResponseDto = postRepository.findPostDetailById(postId, profileId);
         return postResponseDto;
     }
 
@@ -85,9 +84,8 @@ public class PostService {
     }
 
     public PostAllResponseDto findAllPostsByLikeCount(String profileId, int limit, int page) {
-        User user = userRepository.findByProfileId(profileId);
         PageRequest pageRequest = PageRequest.of(page, limit);
-        Page<PostMainDto> pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest, user.getId());
+        Page<PostMainDto> pagePostMainDto = postRepository.findAllPostMainDtoOrderByLikeCount(pageRequest, profileId);
         List<PostMainDto> postMainDtoList = pagePostMainDto.getContent();
         return new PostAllResponseDto(postMainDtoList);
     }
@@ -100,9 +98,8 @@ public class PostService {
     }
 
     public PostAllResponseDto findAllPostsByCommentsCount(String profileId, int limit, int page) {
-        User user = userRepository.findByProfileId(profileId);
         PageRequest pageRequest = PageRequest.of(page, limit);
-        Page<PostMainDto> pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest, user.getId());
+        Page<PostMainDto> pagePostMainDtoList = postRepository.findAllPostMainDtoOrderByCommentCount(pageRequest, profileId);
         List<PostMainDto> postMainDtoList = pagePostMainDtoList.getContent();
         return new PostAllResponseDto(postMainDtoList);
     }
@@ -116,12 +113,9 @@ public class PostService {
 
 
     public MyActivitiesResponse getMyActivity(String profileId, int page, int limit) {
-        User findUser = userRepository.findByProfileId(profileId);
-        Long userId = findUser.getId();
-
         PageRequest pageRequest = PageRequest.of(page, limit);
 
-        Page<PostMyActivityDto> pageMyPost = postRepository.findMyPost(userId, pageRequest);
+        Page<PostMyActivityDto> pageMyPost = postRepository.findMyPost(profileId, pageRequest);
         List<PostMyActivityDto> myActivityPosts = pageMyPost.getContent();
         return new MyActivitiesResponse(myActivityPosts);
     }

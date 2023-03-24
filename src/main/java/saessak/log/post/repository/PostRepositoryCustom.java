@@ -15,9 +15,9 @@ public interface PostRepositoryCustom {
 
     PostResponseDto findPostDetailById(Long postId);
 
-    PostResponseDto findPostDetailById(Long postId, Long userId);
+    PostResponseDto findPostDetailById(Long postId, String profileId);
 
-    Page<PostMyActivityDto> findMyPost(Long userId, Pageable pageable);
+    Page<PostMyActivityDto> findMyPost(String profileId, Pageable pageable);
 
     Page<SubscribePostDto> findSubscribedPosts(Long userId, Pageable pageable);
 

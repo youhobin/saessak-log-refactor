@@ -78,7 +78,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public PostResponseDto findPostDetailById(Long postId, Long userId) {
+    public PostResponseDto findPostDetailById(Long postId, String profileId) {
         return queryFactory
             .select(Projections.constructor(PostResponseDto.class,
                 user.profileId,
@@ -88,7 +88,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                 ExpressionUtils.as(
                     JPAExpressions.selectOne()
                         .from(subscription)
-                        .where(subscription.fromUserId.id.eq(userId)
+                        .where(subscription.fromUserId.profileId.eq(profileId)
                             .and(subscription.toUserId.id.eq(user.id)))
                         .exists(),
                     "subscribed"
@@ -97,7 +97,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
                     JPAExpressions.selectOne()
                         .from(reaction)
                         .where(reaction.post.id.eq(post.id)
-                            .and(reaction.user.id.eq(userId)))
+                            .and(reaction.user.profileId.eq(profileId)))
                         .exists(),
                     "liked"
                 )
@@ -111,7 +111,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
     }
 
     @Override
-    public Page<PostMyActivityDto> findMyPost(Long userId, Pageable pageable) {
+    public Page<PostMyActivityDto> findMyPost(String profileId, Pageable pageable) {
         List<PostMyActivityDto> content = queryFactory
             .select(Projections.constructor(PostMyActivityDto.class,
                 post.id,
@@ -122,7 +122,7 @@ public class PostRepositoryCustomImpl implements PostRepositoryCustom{
             .from(post)
             .leftJoin(post.user, user)
             .leftJoin(post.postMedia, postMedia)
-            .where(user.id.eq(userId))
+            .where(user.profileId.eq(profileId))
             .groupBy(post.id)
             .orderBy(post.createdDate.desc())
             .offset(pageable.getOffset())

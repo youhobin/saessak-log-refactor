@@ -25,12 +25,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
             "left join p.postMedia pm " +
             "left join p.user u " +
             "left join Reaction r " +
-            "on r.user.id = :userId " +
+            "on r.user.profileId = :profileId " +
             "and r.post.id = p.id " +
             "group by p.id " +
             "order by p.reactionCount desc, p.createdDate desc",
         countQuery = "select count(p) from Post p")
-    Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable, @Param("userId") Long userId);
+    Page<PostMainDto> findAllPostMainDtoOrderByLikeCount(Pageable pageable, @Param("profileId") String profileId);
 
     @Query(value = "select new saessak.log.post.dto.PostMainDto(p.id, u.profileId, pm.imageFile, p.commentsCount, p.reactionCount) " +
             "from Post p " +
@@ -46,12 +46,12 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
             "left join p.postMedia pm " +
             "left join p.user u " +
             "left join Reaction r " +
-            "on r.user.id = :userId " +
+            "on r.user.profileId = :profileId " +
             "and r.post.id = p.id " +
             "group by p.id " +
             "order by p.commentsCount desc, p.createdDate desc",
         countQuery = "select count(p) from Post p")
-    Page<PostMainDto> findAllPostMainDtoOrderByCommentCount(Pageable pageable, @Param("userId") Long userId);
+    Page<PostMainDto> findAllPostMainDtoOrderByCommentCount(Pageable pageable, @Param("profileId") String profileId);
 
 
 
